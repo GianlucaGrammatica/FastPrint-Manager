@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Threading;
 using System.Threading.Tasks;
 
 class Program
@@ -11,12 +10,12 @@ class Program
         Stopwatch stopwatch = Stopwatch.StartNew();
 
         // Avvio dei task concorrenti
-        int stampante1 = SimulaStampante("Stampante 1");
-        int stampante2 = SimulaStampante("Stampante 2");
-        int stampante3 = SimulaStampante("Stampante 3");
+        Task<int> stampante1 = SimulaStampante("Stampante 1");
+        Task<int> stampante2 = SimulaStampante("Stampante 2");
+        Task<int> stampante3 = SimulaStampante("Stampante 3");
 
         // Aspetta che tutti i task siano completati
-        int[] risultati = {stampante1, stampante2, stampante3};
+        int[] risultati = await Task.WhenAll(stampante1, stampante2, stampante3);
 
         stopwatch.Stop();
         Console.WriteLine("\n--- Risultati ---");
@@ -28,7 +27,7 @@ class Program
         Console.ReadKey();
     }
 
-    static int SimulaStampante(string nomeStampante)
+    static async Task<int> SimulaStampante(string nomeStampante)
     {
         Random random = new Random();
         int numeroDocumenti = random.Next(5, 16);
@@ -38,7 +37,7 @@ class Program
         for (int i = 0; i < numeroDocumenti; i++)
         {
             int tempoStampa = random.Next(100, 501);
-            Thread.Sleep(tempoStampa);
+            await Task.Delay(tempoStampa); // Simula il tempo di stampa per un documento
             Console.WriteLine($"{nomeStampante} ha stampato il documento {i + 1}/{numeroDocumenti}.");
         }
 
